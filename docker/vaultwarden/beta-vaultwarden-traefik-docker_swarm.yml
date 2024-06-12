@@ -1,0 +1,32 @@
+version: "3"
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    networks:
+      - proxynet
+    environment:
+        # This is required to allow vaultwarden to verify the TLS certificate!
+      - DOMAIN=https://vaultwarden.local #domain testing
+    volumes:
+      - vaultwarden:/data
+    deploy:  
+     labels:
+      - "traefik.enable=true"
+    ## HTTP Routers
+      - "traefik.http.routers.vaultwarden.entrypoints=https"
+      - "traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.local`)"
+      - "traefik.http.routers.vaultwarden.tls=true"
+    ## Middlewares
+    ###- "traefik.http.routers.vaultwarden.middlewares=chain-no-auth@file"
+    ## HTTP Services
+      - "traefik.http.routers.vaultwarden.service=vaultwarden-1"
+      - "traefik.http.services.vaultwarden-1.loadbalancer.server.port=80"
+     placement:
+      constraints:
+       - "node.role==manager"
+volumes:
+ vaultwarden:
+networks:
+ proxynet:
+  external: true
+ 
