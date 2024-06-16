@@ -1,11 +1,10 @@
 version: "3.7"
 ####Using Docker_SWARM####
 services:
-      ##########MariaDB##########
+      ########## Services MariaDB ##########
   db:
     image: mariadb:10.6
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
-    hostname: db
     volumes:
       - db:/var/lib/mysql:Z
     environment:
@@ -16,20 +15,19 @@ services:
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
     networks:
-      - nextcloudnet
+      - default
     deploy:
      placement:
       constraints:
        - "node.role==manager"
 
-      ##########Redis##########
+      ########## Services Redis ##########
   redis:
     image: redis:alpine
-    hostname: redis
     networks:
-      - nextcloudnet
+      - default
      
-      ##########Nextcloud_Apache##########
+      ########## Nextcloud_Apache ##########
   nextcloud-apache:
     image: nextcloud:apache
     volumes:
@@ -55,10 +53,10 @@ services:
       - db
       - redis
     networks:
-      - nextcloudnet
+      - default
       - proxynet
 
-      ##########Cron##########
+      ########## Cron ##########
   cron:
     image: nextcloud:apache
     volumes:
@@ -68,7 +66,7 @@ services:
       - db
       - redis
     networks:
-      - nextcloudnet
+      - default
     deploy:
      placement:
       constraints:
@@ -82,6 +80,4 @@ networks:
  proxynet:
   external: true
 
- nextcloudnet:
-  driver: overlay
     
