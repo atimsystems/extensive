@@ -1,0 +1,18 @@
+#mport = [
+#   "~/.config/alacritty/themes/test.toml"
+#
+
+[window]
+opacity = 0.88
+
+[window.dimensions]
+columns = 100
+lines = 23
+
+
+[font.normal]
+family = "MesloLGS NF"
+
+[font]
+size = 11
+
