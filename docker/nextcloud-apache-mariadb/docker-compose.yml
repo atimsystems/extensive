@@ -47,6 +47,7 @@ services:
       - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.local`)"
       - "traefik.http.routers.nextcloud.tls=true"
       - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxynet"
      placement:
       constraints:
        - "node.role==manager"
