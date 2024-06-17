@@ -1,0 +1,50 @@
+version: '3'
+services:
+  reverse-proxy:
+    image: mirror.gcr.io/traefik:v3.0
+    command: 
+     - "--api.insecure=false" 
+     - "--api.dashboard=true"
+
+     ####Providers##
+     - "--providers.swarm.exposedByDefault=false"
+     - "--providers.swarm"
+     - "--providers.swarm.network=proxynet"
+     ###Log###
+     - "--accesslog"
+     - "--log.level=DEBUG"
+     ###Entrypoints###
+     - "--entrypoints.http.address=:80"
+     - "--entrypoints.https.address=:443"
+     ###Redirect auto https###
+     # - "--entrypoints.http.http.redirections.entrypoint.to=https"
+     # - "--entrypoints.http.http.redirections.entrypoint.scheme=https"
+
+    ports:
+     - "80:80"
+     - "443:443"
+     #- "8080:8080"
+    deploy:
+     labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.dashboard.entrypoints=https"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$R59tLBDd$$358PZSWToQRJHEiVE/9Pl1"
+      
+     placement:
+      constraints:
+       - "node.role==manager"
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     
+    networks:
+     #- default
+     - proxynet
+
+networks:
+ proxynet:
+  external: true
